@@ -195,7 +195,16 @@ class Program
             for (int count = 1; count <= 3; count++)
             {
                 Console.Write("Enter command: ");
-                commands.Add(Console.ReadLine().ToLower());
+                var command = Console.ReadLine().ToLower();
+                if (command == "hexes")
+                {
+                    Console.WriteLine(grid.GetGridAsIndices());
+                    count--;
+                }
+                else
+                {
+                    commands.Add(command.ToLower());
+                }
             }
             foreach (var c in commands)
             {
@@ -853,6 +862,22 @@ class HexGrid
         return gridAsString + CreateBottomLine();
     }
 
+    public string GetGridAsIndices()
+    {
+        int listPositionOfTile = 0;
+        string gridAsString = CreateTopLine() + CreateEvenIndicesLine(true, ref listPositionOfTile);
+        listPositionOfTile += 1;
+        gridAsString += CreateOddIndicesLine(ref listPositionOfTile);
+        for (var count = 1; count <= size - 2; count += 2)
+        {
+            listPositionOfTile += 1;
+            gridAsString += CreateEvenIndicesLine(false, ref listPositionOfTile);
+            listPositionOfTile += 1;
+            gridAsString += CreateOddIndicesLine(ref listPositionOfTile);
+        }
+        return gridAsString + CreateBottomLine();
+    }
+
     private void MovePiece(int newIndex, int oldIndex)
     {
         tiles[newIndex].SetPiece(tiles[oldIndex].GetPieceInTile());
@@ -937,6 +962,68 @@ class HexGrid
         else
         {
             line += GetPieceTypeInTile(listPositionOfTile) + @"\__/" + Environment.NewLine;
+        }
+        return line;
+    }
+
+    private string CreateOddIndicesLine(ref int listPositionOfTile)
+    {
+        string line = "";
+        for (var count = 1; count <= (size / 2); count++)
+        {
+            if (count > 1 & count < size / 2)
+            {
+                if (listPositionOfTile > 9)
+                {
+                    line += listPositionOfTile;
+                }
+                else
+                {
+                    line += $" {listPositionOfTile}";
+                }
+                line += @"\__/";
+                listPositionOfTile++;
+            }
+            else if (count == 1)
+            {
+                line += @" \__/";
+            }
+        }
+        line += @"\__/";
+        if (listPositionOfTile < tiles.Count())
+        {
+            line += $" {listPositionOfTile}" + @"\" + Environment.NewLine;
+        }
+        else
+        {
+            line += @"\" + Environment.NewLine;
+        }
+        return line;
+    }
+
+    private string CreateEvenIndicesLine(bool firstEvenLine, ref int listPositionOfTile)
+    {
+        string line = " /";
+        for (var count = 1; count <= size / 2; count++)
+        {
+            if (listPositionOfTile > 9)
+            {
+                line += listPositionOfTile;
+            }
+            else
+            {
+                line += $" {listPositionOfTile}";
+            }
+            listPositionOfTile++;
+            line += @"\__/";
+        }
+        if (firstEvenLine)
+        {
+            line += @"\__" + Environment.NewLine;
+        }
+        else
+        {
+            line += @"\__/" + Environment.NewLine;
         }
         return line;
     }
