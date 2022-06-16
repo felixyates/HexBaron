@@ -86,8 +86,10 @@ class Program
         player2 = new Player("Player Two", 1, 10, 10, 5);
         grid.SetUpGridTerrain(t);
         grid.AddPiece(true, "Baron", 0);
-        grid.AddPiece(true, "Serf", 8);
+        grid.AddPiece(true, "Serf", 7);
+        grid.AddPiece(true, "Serf", 13);
         grid.AddPiece(false, "Baron", 31);
+        grid.AddPiece(false, "Serf", 15);
         grid.AddPiece(false, "Serf", 23);
     }
 
@@ -239,10 +241,10 @@ class Program
             int player2VPsGained = 0;
             if (gameOver)
             {
-                grid.DestroyPiecesAndCountVPs(ref player1VPsGained, ref player2VPsGained);
+                grid.DestroyPiecesAndCountVPs(ref player1VPsGained, ref player2VPsGained, ref player1, ref player2);
             }
             else
-                gameOver = grid.DestroyPiecesAndCountVPs(ref player1VPsGained, ref player2VPsGained);
+                gameOver = grid.DestroyPiecesAndCountVPs(ref player1VPsGained, ref player2VPsGained, ref player1, ref player2);
             player1.AddToVPs(player1VPsGained);
             player2.AddToVPs(player2VPsGained);
             Console.WriteLine("Player One current state - " + player1.GetStateString());
@@ -794,7 +796,7 @@ class HexGrid
         }
     }
 
-    public bool DestroyPiecesAndCountVPs(ref int player1VPs, ref int player2VPs)
+    public bool DestroyPiecesAndCountVPs(ref int player1VPs, ref int player2VPs, ref Player player1, ref Player player2)
     {
         bool baronDestroyed = false;
         List<Tile> listOfTilesContainingDestroyedPieces = new List<Tile>();
@@ -821,10 +823,12 @@ class HexGrid
                     if (thePiece.GetBelongsToPlayer1())
                     {
                         player2VPs += thePiece.GetVPs();
+                        player1.AddPiecesInSupply(1);
                     }
                     else
                     {
                         player1VPs += thePiece.GetVPs();
+                        player2.AddPiecesInSupply(2);
                     }
                 }
             }
@@ -979,6 +983,11 @@ class Player
     public virtual string GetName()
     {
         return name;
+    }
+
+    public virtual void AddPiecesInSupply(int n)
+    {
+        piecesInSupply += n;
     }
 
     public virtual void AddToVPs(int n)
