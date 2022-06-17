@@ -969,30 +969,26 @@ class HexGrid
     private string CreateOddIndicesLine(ref int listPositionOfTile)
     {
         string line = "";
-        for (var count = 1; count <= (size / 2); count++)
+        for (var count = 1; count <= (size / 2) - 1; count++)
         {
-            if (count > 1 & count < size / 2)
+            if (count > 1)
             {
-                if (listPositionOfTile > 9)
-                {
-                    line += listPositionOfTile;
-                }
-                else
-                {
-                    line += $" {listPositionOfTile}";
-                }
+                line += listPositionOfTile.ToString().PadLeft(2);
                 line += @"\__/";
-                listPositionOfTile++;
             }
             else if (count == 1)
             {
-                line += @" \__/";
+                line += @" \__/" + listPositionOfTile.ToString().PadLeft(2) + @"\";
+            }
+            listPositionOfTile++;
+            if (count < (size / 2) - 2)
+            {
+                line += @"__/";
             }
         }
-        line += @"\__/";
         if (listPositionOfTile < tiles.Count())
         {
-            line += $" {listPositionOfTile}" + @"\" + Environment.NewLine;
+            line += listPositionOfTile.ToString().PadLeft(2) + @"\" + Environment.NewLine;
         }
         else
         {
@@ -1003,19 +999,11 @@ class HexGrid
 
     private string CreateEvenIndicesLine(bool firstEvenLine, ref int listPositionOfTile)
     {
-        string line = " /";
-        for (var count = 1; count <= size / 2; count++)
+        string line = " /" + listPositionOfTile.ToString().PadLeft(2);
+        for (var count = 1; count <= (size / 2) - 1; count++)
         {
-            if (listPositionOfTile > 9)
-            {
-                line += listPositionOfTile;
-            }
-            else
-            {
-                line += $" {listPositionOfTile}";
-            }
             listPositionOfTile++;
-            line += @"\__/";
+            line += @"\__/" + listPositionOfTile.ToString().PadLeft(2);
         }
         if (firstEvenLine)
         {
