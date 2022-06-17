@@ -828,7 +828,7 @@ class HexGrid
                     else
                     {
                         player1VPs += thePiece.GetVPs();
-                        player2.AddPiecesInSupply(2);
+                        player2.AddPiecesInSupply(1);
                     }
                 }
             }
