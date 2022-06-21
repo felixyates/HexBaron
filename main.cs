@@ -87,6 +87,10 @@ class Program
         grid.SetUpGridTerrain(t);
         grid.AddPiece(true, "Baron", 0);
         grid.AddPiece(true, "Serf", 8);
+        grid.AddPiece(true, "Serf", 24);
+        grid.AddPiece(true, "Serf", 5);
+        grid.AddPiece(true, "Serf", 2);
+        grid.AddPiece(true, "Serf", 3);
         grid.AddPiece(false, "Baron", 31);
         grid.AddPiece(false, "Serf", 23);
     }
@@ -684,6 +688,7 @@ class HexGrid
     private int ExecuteSpawnCommand(List<string> items, int lumberAvailable, int piecesInSupply)
     {
         int tileToUse = Convert.ToInt32(items[1]);
+        Console.WriteLine(piecesInSupply);
         if (piecesInSupply < 1 || lumberAvailable < 3 || !CheckTileIndexIsValid(tileToUse))
         {
             return -1;
