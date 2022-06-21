@@ -578,7 +578,7 @@ class HexGrid
             case "saw":
             case "dig":
                 {
-                    if (!ExecuteCommandInTile(items, ref fuelChange, ref lumberChange))
+                    if (!ExecuteCommandInTile(items, ref fuelChange, ref lumberChange, ref prevTile, ref digTimes, ref sawTimes))
                     {
                         return "Couldn't do that";
                     }
@@ -626,7 +626,7 @@ class HexGrid
         return false;
     }
 
-    private bool ExecuteCommandInTile(List<string> items, ref int fuel, ref int lumber)
+    private bool ExecuteCommandInTile(List<string> items, ref int fuel, ref int lumber, ref int prevTile, ref int digTimes, ref int sawTimes)
     {
         int tileToUse = Convert.ToInt32(items[1]);
         if (CheckPieceAndTileAreValid(tileToUse) == false)
