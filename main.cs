@@ -685,6 +685,10 @@ class HexGrid
                 fuelCost--;
             }
         }
+        else
+        {
+            samePieceMoves = 0;
+        }
         if (fuelCost == -1 || fuelAvailable < fuelCost)
         {
             return -1;
