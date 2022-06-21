@@ -197,6 +197,8 @@ class Program
                 Console.Write("Enter command: ");
                 commands.Add(Console.ReadLine().ToLower());
             }
+            int samePieceMoves = 0;
+            int prevEnd = -1;
             foreach (var c in commands)
             {
                 List<string> items = new List<string>(c.Split(' '));
@@ -211,8 +213,10 @@ class Program
                     string summaryOfResult;
                     if (player1Turn)
                     {
-                        summaryOfResult = grid.ExecuteCommand(items, ref fuelChange, ref lumberChange, ref supplyChange,
-                            player1.GetFuel(), player1.GetLumber(), player1.GetPiecesInSupply());
+                        summaryOfResult = grid.ExecuteCommand(
+                            items, ref fuelChange, ref lumberChange, ref supplyChange,
+                            player1.GetFuel(), player1.GetLumber(), player1.GetPiecesInSupply(),
+                        ref samePieceMoves, ref prevEnd);
                         player1.UpdateLumber(lumberChange);
                         player1.UpdateFuel(fuelChange);
                         if (supplyChange == 1)
@@ -221,7 +225,7 @@ class Program
                     else
                     {
                         summaryOfResult = grid.ExecuteCommand(items, ref fuelChange, ref lumberChange, ref supplyChange,
-                            player2.GetFuel(), player2.GetLumber(), player2.GetPiecesInSupply());
+                            player2.GetFuel(), player2.GetLumber(), player2.GetPiecesInSupply(), ref samePieceMoves, ref prevEnd);
                         player2.UpdateLumber(lumberChange);
                         player2.UpdateFuel(fuelChange);
                         if (supplyChange == 1)
@@ -561,13 +565,13 @@ class HexGrid
 
     public string ExecuteCommand(List<string> items, ref int fuelChange, ref int lumberChange,
                                  ref int supplyChange, int fuelAvailable, int lumberAvailable,
-                                 int piecesInSupply)
+                                 int piecesInSupply, ref int samePieceMoves, ref int prevEnd)
     {
         switch (items[0])
         {
             case "move":
                 {
-                    int fuelCost = ExecuteMoveCommand(items, fuelAvailable);
+                    int fuelCost = ExecuteMoveCommand(ref samePieceMoves, ref prevEnd, items, fuelAvailable);
                     if (fuelCost < 0)
                     {
                         return "That move can't be done";
@@ -658,7 +662,7 @@ class HexGrid
         return false;
     }
 
-    private int ExecuteMoveCommand(List<string> items, int fuelAvailable)
+    private int ExecuteMoveCommand(ref int samePieceMoves, ref int prevEnd, List<string> items, int fuelAvailable)
     {
         int startID = Convert.ToInt32(items[1]);
         int endID = Convert.ToInt32(items[2]);
@@ -673,6 +677,14 @@ class HexGrid
         }
         int distance = tiles[startID].GetDistanceToTileT(tiles[endID]);
         int fuelCost = thePiece.CheckMoveIsValid(distance, tiles[startID].GetTerrain(), tiles[endID].GetTerrain());
+        if (startID == prevEnd)
+        {
+            samePieceMoves++;
+            if (samePieceMoves == 3)
+            {
+                fuelCost--;
+            }
+        }
         if (fuelCost == -1 || fuelAvailable < fuelCost)
         {
             return -1;
