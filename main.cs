@@ -82,7 +82,7 @@ class Program
                                                  , " ", " ", "#", "#", "#", "#", "~", "~", "~", "~", "~", " ", "#", " ", "#", " "};
         int gridSize = 8;
         grid = new HexGrid(gridSize);
-        player1 = new Player("Player One", 0, 10, 10, 5);
+        player1 = new Player("Player One", 0, 2, 10, 5);
         player2 = new Player("Player Two", 1, 10, 10, 5);
         grid.SetUpGridTerrain(t);
         grid.AddPiece(true, "Baron", 0);
@@ -690,6 +690,7 @@ class HexGrid
             return -1;
         }
         MovePiece(endID, startID);
+        prevEnd = endID;
         return fuelCost;
     }
 
