@@ -150,6 +150,24 @@ class Program
         return false;
     }
 
+    public static bool CheckDowngradeCommandIsValid(List<string> items)
+    {
+        int result;
+        if (items.Count == 2)
+        {
+            try
+            {
+                result = Convert.ToInt32(items[1]);
+            }
+            catch
+            {
+                return false;
+            }
+            return true;
+        }
+        return false;
+    }
+    
     public static bool CheckCommandIsValid(List<string> items)
     {
         if (items.Count > 0)
@@ -171,6 +189,10 @@ class Program
                 case "upgrade":
                     {
                         return CheckUpgradeCommandFormat(items);
+                    }
+                case "downgrade":
+                    {
+                        return CheckDowngradeCommandFormat(items);
                     }
             }
         }
@@ -744,6 +766,11 @@ class HexGrid
             tiles[tileToUse].SetPiece(thePiece);
             return 5;
         }
+    }
+
+    private int ExecuteDowngradeCommand()
+    {
+        
     }
 
     private void SetUpTiles()
