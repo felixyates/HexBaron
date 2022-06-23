@@ -197,6 +197,8 @@ class Program
                 Console.Write("Enter command: ");
                 commands.Add(Console.ReadLine().ToLower());
             }
+            int prevTile = -1;
+            int opTimes = 0;
             foreach (var c in commands)
             {
                 List<string> items = new List<string>(c.Split(' '));
@@ -212,7 +214,7 @@ class Program
                     if (player1Turn)
                     {
                         summaryOfResult = grid.ExecuteCommand(items, ref fuelChange, ref lumberChange, ref supplyChange,
-                            player1.GetFuel(), player1.GetLumber(), player1.GetPiecesInSupply());
+                            player1.GetFuel(), player1.GetLumber(), player1.GetPiecesInSupply(), ref prevTile, ref opTimes);
                         player1.UpdateLumber(lumberChange);
                         player1.UpdateFuel(fuelChange);
                         if (supplyChange == 1)
@@ -221,7 +223,7 @@ class Program
                     else
                     {
                         summaryOfResult = grid.ExecuteCommand(items, ref fuelChange, ref lumberChange, ref supplyChange,
-                            player2.GetFuel(), player2.GetLumber(), player2.GetPiecesInSupply());
+                            player2.GetFuel(), player2.GetLumber(), player2.GetPiecesInSupply(), ref prevTile, ref opTimes);
                         player2.UpdateLumber(lumberChange);
                         player2.UpdateFuel(fuelChange);
                         if (supplyChange == 1)
@@ -528,6 +530,12 @@ class HexGrid
         player1Turn = true;
     }
 
+    public void MakeField(int index)
+    {
+        Tile tile = tiles[index];
+        tile.SetTerrain(" ");
+    }
+
     public void SetUpGridTerrain(List<string> listOfTerrain)
     {
         for (int count = 0; count < listOfTerrain.Count; count++)
@@ -561,7 +569,7 @@ class HexGrid
 
     public string ExecuteCommand(List<string> items, ref int fuelChange, ref int lumberChange,
                                  ref int supplyChange, int fuelAvailable, int lumberAvailable,
-                                 int piecesInSupply)
+                                 int piecesInSupply, ref int prevTile, ref int opTimes)
     {
         switch (items[0])
         {
@@ -578,7 +586,7 @@ class HexGrid
             case "saw":
             case "dig":
                 {
-                    if (!ExecuteCommandInTile(items, ref fuelChange, ref lumberChange, ref prevTile, ref digTimes, ref sawTimes))
+                    if (!ExecuteCommandInTile(items, ref fuelChange, ref lumberChange, ref prevTile, ref opTimes))
                     {
                         return "Couldn't do that";
                     }
@@ -626,7 +634,7 @@ class HexGrid
         return false;
     }
 
-    private bool ExecuteCommandInTile(List<string> items, ref int fuel, ref int lumber, ref int prevTile, ref int digTimes, ref int sawTimes)
+    private bool ExecuteCommandInTile(List<string> items, ref int fuel, ref int lumber, ref int prevTile, ref int opTimes)
     {
         int tileToUse = Convert.ToInt32(items[1]);
         if (CheckPieceAndTileAreValid(tileToUse) == false)
@@ -641,20 +649,43 @@ class HexGrid
             Type t = thePiece.GetType();
             System.Reflection.MethodInfo method = t.GetMethod(methodToCall);
             object[] parameters = { tiles[tileToUse].GetTerrain() };
-            if (items[0] == "Saw")
+            if (prevTile == tileToUse)
             {
-                lumber += Convert.ToInt32(method.Invoke(thePiece, parameters));
-            }
-            else if (items[0] == "Dig")
-            {
-                fuel += Convert.ToInt32(method.Invoke(thePiece, parameters));
-                if (Math.Abs(fuel) > 2)
+                opTimes++;
+                if (opTimes == 3)
                 {
-                    tiles[tileToUse].SetTerrain(" ");
+                    if (items[0] == "Saw")
+                    {
+                        lumber += 5;
+                        MakeField(tileToUse);
+                    }
+                    else if (items[0] == "Dig")
+                    {
+                        fuel += 5;
+                        MakeField(tileToUse);
+                    }
                 }
             }
+            else
+            {
+                opTimes = 0;
+                if (items[0] == "Saw")
+                {
+                    lumber += Convert.ToInt32(method.Invoke(thePiece, parameters));
+                }
+                else if (items[0] == "Dig")
+                {
+                    fuel += Convert.ToInt32(method.Invoke(thePiece, parameters));
+                    if (Math.Abs(fuel) > 2)
+                    {
+                        MakeField(tileToUse);
+                    }
+                }
+            }
+            prevTile = tileToUse;
             return true;
         }
+        prevTile = tileToUse;
         return false;
     }
 
