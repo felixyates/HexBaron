@@ -86,7 +86,7 @@ class Program
         player2 = new Player("Player Two", 1, 10, 10, 5);
         grid.SetUpGridTerrain(t);
         grid.AddPiece(true, "Baron", 0);
-        grid.AddPiece(true, "Serf", 8);
+        grid.AddPiece(true, "Serf", 16);
         grid.AddPiece(false, "Baron", 31);
         grid.AddPiece(false, "Serf", 23);
     }
@@ -150,7 +150,7 @@ class Program
         return false;
     }
 
-    public static bool CheckDowngradeCommandIsValid(List<string> items)
+    public static bool CheckDowngradeCommandFormat(List<string> items)
     {
         int result;
         if (items.Count == 2)
@@ -623,6 +623,14 @@ class HexGrid
                     lumberChange = -lumberCost;
                     break;
                 }
+            case "downgrade":
+                {
+                    int lumberCost = ExecuteDowngradeCommand(items, lumberAvailable);
+                    if (lumberCost < 0)
+                        return "Downgrade not possible";
+                    lumberChange = -lumberCost;
+                    break;
+                }
         }
         return "Command executed";
     }
@@ -768,9 +776,33 @@ class HexGrid
         }
     }
 
-    private int ExecuteDowngradeCommand()
+    private int ExecuteDowngradeCommand(List<string> items, int lumberAvailable)
     {
-        
+        int tileToUse = Convert.ToInt32(items[1]);
+        if (!CheckPieceAndTileAreValid(tileToUse))
+        {
+            Console.WriteLine("Piece/tile not valid");
+            return -1;
+        }
+        else if (lumberAvailable < 1)
+        {
+            Console.WriteLine("Not enough lumber");
+            return -1;
+        }
+        else
+        {
+            Piece thePiece = tiles[tileToUse].GetPieceInTile();
+            if (thePiece.GetPieceType().ToUpper() == "S")
+            {
+                Console.WriteLine("Cannot downgrade serf");
+                return -1;
+            }
+            thePiece.DestroyPiece();
+            thePiece = new Piece(player1Turn);
+            pieces.Add(thePiece);
+            tiles[tileToUse].SetPiece(thePiece);
+            return 1;
+        }
     }
 
     private void SetUpTiles()
