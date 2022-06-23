@@ -86,9 +86,12 @@ class Program
         player2 = new Player("Player Two", 1, 10, 10, 5);
         grid.SetUpGridTerrain(t);
         grid.AddPiece(true, "Baron", 0);
-        grid.AddPiece(true, "Serf", 8);
-        grid.AddPiece(false, "Baron", 31);
-        grid.AddPiece(false, "Serf", 23);
+        grid.AddPiece(true, "Serf", 15);
+        grid.AddPiece(true, "Serf", 27);
+        grid.AddPiece(true, "Serf", 25);
+        grid.AddPiece(false, "Baron", 19);
+        grid.AddPiece(false, "Serf", 8);
+        grid.AddPiece(false, "Serf", 2);
     }
 
     public static bool CheckMoveCommandFormat(List<string> items)
@@ -359,6 +362,7 @@ class BaronPiece : Piece
     {
         pieceType = "B";
         VPValue = 10;
+        connectionsToDestroy = 3;
     }
 
     public override int CheckMoveIsValid(int distanceBetweenTiles, string startTerrain, string endTerrain)
